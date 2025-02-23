@@ -9,6 +9,25 @@ class Loginpage extends StatefulWidget {
 }
 
 class _Loginpage extends State<Loginpage> {
+  TextEditingController username = TextEditingController();
+  TextEditingController password = TextEditingController();
+
+  void login() {
+    String user = username.text.trim();
+    String pass = password.text.trim();
+    if (user.isEmpty || pass.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter username and password')),
+      );
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('login successul '),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,6 +53,7 @@ class _Loginpage extends State<Loginpage> {
                   children: [
                     TextField(
                       decoration: InputDecoration(label: Text('Username')),
+                      controller: username,
                     ),
                     const SizedBox(
                       height: 8,
@@ -42,11 +62,30 @@ class _Loginpage extends State<Loginpage> {
                       decoration: InputDecoration(
                         label: Text('Password'),
                       ),
+                      controller: password,
                       obscureText: true,
                     )
                   ],
                 ),
               ),
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            ElevatedButton(
+              onPressed: login,
+              child: Text('LOGIN'),
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text('New Login? '),
+                TextButton(onPressed: () {}, child: Text('Register.'))
+              ],
             )
           ],
         ),
