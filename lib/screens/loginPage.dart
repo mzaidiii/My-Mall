@@ -52,7 +52,7 @@ class _Loginpage extends State<Loginpage> {
                 child: Column(
                   children: [
                     TextField(
-                      decoration: InputDecoration(label: Text('Username')),
+                      decoration: InputDecoration(label: Text('Email Address')),
                       controller: username,
                     ),
                     const SizedBox(
