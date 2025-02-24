@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:practice/screens/rejister.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+final _Firebase = FirebaseAuth.instance;
 
 class Loginpage extends StatefulWidget {
   @override
@@ -12,7 +16,7 @@ class _Loginpage extends State<Loginpage> {
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
 
-  void login() {
+  void login() async {
     String user = username.text.trim();
     String pass = password.text.trim();
     if (user.isEmpty || pass.isEmpty) {
@@ -21,11 +25,21 @@ class _Loginpage extends State<Loginpage> {
       );
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('login successul '),
-      ),
-    );
+    try {
+      final credential = await _Firebase.signInWithEmailAndPassword(
+          email: user, password: pass);
+      print('login sucessfull');
+    } on FirebaseAuthException catch (error) {
+      if (error.code == 'email-alredry-in-use') {
+        return;
+      }
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.message ?? 'Authentication Failed'),
+        ),
+      );
+    }
   }
 
   @override
@@ -84,7 +98,14 @@ class _Loginpage extends State<Loginpage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text('New Login? '),
-                TextButton(onPressed: () {}, child: Text('Register.'))
+                TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (ctx) => Rejister()),
+                      );
+                    },
+                    child: Text('Register.'))
               ],
             )
           ],
