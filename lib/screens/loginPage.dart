@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:practice/screens/MainScreen.dart';
 import 'package:practice/screens/rejister.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -26,9 +27,10 @@ class _Loginpage extends State<Loginpage> {
       return;
     }
     try {
-      final credential = await _Firebase.signInWithEmailAndPassword(
-          email: user, password: pass);
-      print('login sucessfull');
+      await _Firebase.signInWithEmailAndPassword(email: user, password: pass);
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (ctx) => Mainscreen()),
+      );
     } on FirebaseAuthException catch (error) {
       if (error.code == 'email-alredry-in-use') {
         return;
