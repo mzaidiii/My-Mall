@@ -21,41 +21,50 @@ class App extends StatelessWidget {
       title: "My Mall Partner App",
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Color(0xFF1C31CE),
-          primary: Color(0xFF1C31CE),
-          secondary: Color(0xFFFF8C42),
-          background: Color(0xFFF8F9FA),
+        colorScheme: ColorScheme(
+          brightness: Brightness.light,
+          primary: Color(0xFF673AB7),
+          secondary: Color(0xFFFF5722),
+          background: Color(0xFFF5F5F5),
           surface: Colors.white,
+          error: Colors.redAccent,
           onPrimary: Colors.white,
-          onSecondary: Colors.black,
+          onSecondary: Colors.white,
           onBackground: Colors.black,
           onSurface: Colors.black,
+          onError: Colors.white,
         ),
         textTheme: TextTheme(
-          titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          bodyMedium: TextStyle(fontSize: 16, color: Colors.black87),
+          titleLarge: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF333333)),
+          bodyMedium: TextStyle(fontSize: 16, color: Color(0xFF555555)),
+          labelLarge: TextStyle(
+              fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF1C31CE),
+            backgroundColor: Color(0xFF673AB7),
             foregroundColor: Colors.white,
             shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
           ),
         ),
         appBarTheme: AppBarTheme(
-          backgroundColor: Color(0xFF1C31CE),
+          backgroundColor: Color(0xFF673AB7),
           foregroundColor: Colors.white,
-          elevation: 4,
-          titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          elevation: 6,
+          titleTextStyle: TextStyle(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+          centerTitle: true,
         ),
         cardTheme: CardTheme(
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           elevation: 4,
-          margin: EdgeInsets.all(8),
+          margin: EdgeInsets.all(10),
         ),
       ),
       home: Frontpage(),
