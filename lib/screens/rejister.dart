@@ -37,7 +37,7 @@ class _RejisterState extends State<Rejister> {
       return;
     } else {
       try {
-        final credential = await _firebase.createUserWithEmailAndPassword(
+        await _firebase.createUserWithEmailAndPassword(
             email: mail.text, password: pass.text);
       } on FirebaseAuthException catch (error) {
         if (error.code == 'email-alredry-in-use') {
