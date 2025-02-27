@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:practice/model/product.dart';
+import 'package:practice/screens/Add.dart';
 
 class Mainscreen extends StatefulWidget {
   @override
@@ -67,7 +68,13 @@ class _MAinscreen extends State<Mainscreen> {
           centerTitle: true,
           automaticallyImplyLeading: false,
           actions: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.add_shopping_cart))
+            IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (ctx) => AddProduct()),
+                  );
+                },
+                icon: Icon(Icons.add_shopping_cart))
           ],
         ),
         body: Padding(
