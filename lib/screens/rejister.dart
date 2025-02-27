@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:practice/model/singnUp.dart';
+import 'package:practice/widget/firestore_Work.dart';
 
 final _firebase = FirebaseAuth.instance;
 
@@ -33,23 +35,38 @@ class _RejisterState extends State<Rejister> {
         number.text.isEmpty ||
         company.text.isEmpty ||
         addres.text.isEmpty ||
-        gst.text.isEmpty) {
+        gst.text.isEmpty ||
+        pass.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill all fields')),
+      );
       return;
-    } else {
-      try {
-        await _firebase.createUserWithEmailAndPassword(
-            email: mail.text, password: pass.text);
-      } on FirebaseAuthException catch (error) {
-        if (error.code == 'email-alredry-in-use') {
-          return;
-        }
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error.message ?? 'Authentication Failed'),
-          ),
-        );
-      }
+    }
+
+    try {
+      await _firebase.createUserWithEmailAndPassword(
+        email: mail.text,
+        password: pass.text,
+      );
+
+      Singnup newUser = Singnup(
+        name: name.text,
+        gmail: mail.text,
+        phoneNumber: number.text,
+        company: company.text,
+        address: addres.text,
+        gst: gst.text,
+      );
+      FirestoreWork firestore = FirestoreWork();
+      await firestore.createUser(newUser);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registration Successful!')),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString())),
+      );
     }
   }
 
