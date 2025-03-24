@@ -1,132 +1,121 @@
 import 'package:flutter/material.dart';
-import 'package:practice/model/product.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:practice/screens/Add.dart';
 
 class Mainscreen extends StatefulWidget {
   @override
-  State<Mainscreen> createState() {
-    return _MAinscreen();
-  }
+  State<Mainscreen> createState() => _MainscreenState();
 }
 
-class _MAinscreen extends State<Mainscreen> {
-  List<Product> products = [
-    Product(
-      id: '1',
-      name: 'Backpack',
-      price: 400,
-      imageUrl: "https://via.placeholder.com/200",
-      description: 'Durable backpack for daily use',
-      category: 'Accessories',
-      createdAt: DateTime.now(),
-    ),
-    Product(
-      id: '2',
-      name: 'Smart Watch',
-      price: 99.99,
-      imageUrl:
-          "https://source.unsplash.com/200x200/?smartwatch", // Random smartwatch image
-      description: 'Fitness tracker with heart rate monitor',
-      category: 'Wearable',
-      createdAt: DateTime.now(),
-    ),
-    Product(
-      id: '3',
-      name: 'Gaming Mouse',
-      price: 39.99,
-      imageUrl:
-          "https://source.unsplash.com/200x200/?mouse", // Random mouse image
-      description: 'Gaming mouse with RGB lighting',
-      category: 'Gaming Accessories',
-      createdAt: DateTime.now(),
-    ),
-    Product(
-      id: '4',
-      name: 'Laptop Backpack',
-      price: 29.99,
-      imageUrl: "https://source.unsplash.com/200x200/?backpack",
-      description: 'Stylish and spacious laptop backpack',
-      category: 'Accessories',
-      createdAt: DateTime.now(),
-    ),
-    Product(
-      id: '5',
-      name: 'Bluetooth Speaker',
-      price: 49.99,
-      imageUrl: "https://source.unsplash.com/200x200/?speaker",
-      description: 'Portable Bluetooth speaker with deep bass',
-      category: 'Audio',
-      createdAt: DateTime.now(),
-    ),
-  ];
-
+class _MainscreenState extends State<Mainscreen> {
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      return Scaffold(
+        body: Center(child: Text("Please log in to see your products")),
+      );
+    }
+
     return Scaffold(
-        appBar: AppBar(
-          title: Text('My Mall'),
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-          actions: [
-            IconButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (ctx) => AddProduct()),
-                  );
-                },
-                icon: Icon(Icons.add_shopping_cart))
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(10),
-          child: GridView.builder(
+      appBar: AppBar(
+        title: Text('My Mall'),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => AddProductScreen()));
+            },
+            icon: Icon(Icons.add_shopping_cart),
+          )
+        ],
+      ),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('products')
+            .where('userId',
+                isEqualTo: user.uid) // Fetch only the current user's products
+            .snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(child: Text("No products added yet."));
+          }
+
+          final products = snapshot.data!.docs;
+
+          return GridView.builder(
+            padding: EdgeInsets.all(10),
             itemCount: products.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, crossAxisSpacing: 10, childAspectRatio: 0.8),
+              crossAxisCount: 2, // 2 items per row
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 0.7,
+            ),
             itemBuilder: (context, index) {
-              final item = products[index];
-              return InkWell(
-                child: Stack(
+              final product = products[index].data() as Map<String, dynamic>;
+
+              return Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 5,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
-                            blurRadius: 5,
-                            spreadRadius: 2,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
+                    Expanded(
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(10)),
                         child: Image.network(
-                          item.imageUrl,
-                          fit: BoxFit.cover,
+                          product['imageUrl'],
                           width: double.infinity,
-                          height: double.infinity,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Icon(Icons.image_not_supported),
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, progress) {
+                            return progress == null
+                                ? child
+                                : Center(child: CircularProgressIndicator());
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.broken_image,
+                                size: 50, color: Colors.red);
+                          },
                         ),
                       ),
                     ),
-                    Positioned(
-                      bottom: 10,
-                      left: 10,
-                      right: 10,
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          Text(item.name),
+                          Text(
+                            product['name'],
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            "₹${product['price']}",
+                            style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               );
             },
-          ),
-        ));
+          );
+        },
+      ),
+    );
   }
 }
