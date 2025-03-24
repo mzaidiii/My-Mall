@@ -28,7 +28,7 @@ class _Loginpage extends State<Loginpage> {
     }
     try {
       await _Firebase.signInWithEmailAndPassword(email: user, password: pass);
-      Navigator.of(context).push(
+      Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (ctx) => Mainscreen()),
       );
     } on FirebaseAuthException catch (error) {
