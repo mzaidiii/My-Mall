@@ -1,49 +1,58 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class Imageinput extends StatefulWidget {
-  const Imageinput({super.key, required this.onPickImgae});
+class ImageInput extends StatefulWidget {
+  const ImageInput({super.key, required this.onPickImage});
 
-  final void Function(File image) onPickImgae;
+  final void Function(File image) onPickImage;
+
   @override
-  State<Imageinput> createState() => _ImageinputState();
+  State<ImageInput> createState() => _ImageInputState();
 }
 
-class _ImageinputState extends State<Imageinput> {
+class _ImageInputState extends State<ImageInput> {
   File? _selectedImage;
-  void _takepicture() async {
-    final imagepicker = ImagePicker();
-    final Imgae =
-        await imagepicker.pickImage(source: ImageSource.gallery, maxWidth: 600);
-    if (Imgae == null) {
-      return;
-    }
+
+  void _takePicture() async {
+    final imagePicker = ImagePicker();
+    final pickedImage = await imagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 600,
+    );
+
+    if (pickedImage == null) return;
+
     setState(() {
-      _selectedImage = File(Imgae.path);
+      _selectedImage = File(pickedImage.path);
     });
-    widget.onPickImgae(_selectedImage!);
+
+    widget.onPickImage(_selectedImage!);
   }
 
   @override
   Widget build(BuildContext context) {
     Widget content = TextButton.icon(
-      onPressed: _takepicture,
+      onPressed: _takePicture,
       label: Text('Add Image'),
       icon: Icon(Icons.camera_alt),
     );
-    if (_selectedImage == null) {
+
+    if (_selectedImage != null) {
       content = Image.file(
         _selectedImage!,
         fit: BoxFit.cover,
+        width: double.infinity,
       );
     }
+
     return Container(
       decoration: BoxDecoration(
-          border: Border.all(
-              width: 2,
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3))),
+        border: Border.all(
+          width: 2,
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+        ),
+      ),
       height: 250,
       width: double.infinity,
       alignment: Alignment.center,
